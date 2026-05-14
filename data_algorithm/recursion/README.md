@@ -52,6 +52,18 @@ The tests are also compatible with `pytest` if you use it for the full project:
 pytest
 ```
 
+From the `recursion_test` folder, run only the `test_flatten_the_array.py` file:
+
+```bash
+python3 -m pytest test_flatten_the_array.py
+```
+
+From the `recursion_test` folder, run all tests in that folder:
+
+```bash
+python3 -m pytest
+```
+
 ## Test Coverage
 
 Install `coverage` if it is not already available in the virtual environment:
