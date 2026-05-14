@@ -29,7 +29,11 @@ Code explanation:
         output list and d is the maximum recursion depth caused by nesting.
 """
 
+import logging
 from typing import Any
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def flatten_array(items: list[Any]) -> list[Any]:
@@ -50,17 +54,21 @@ def flatten_array(items: list[Any]) -> list[Any]:
         >>> flatten_array([1, [2, [3]], 4])
         [1, 2, 3, 4]
     """
+    LOGGER.debug("Flattening items: %s", items)
     flattened: list[Any] = []
 
     for item in items:
         if isinstance(item, list):
             # Recursive step: solve the same problem for the smaller nested list.
+            LOGGER.debug("Found nested list: %s", item)
             flattened.extend(flatten_array(item))
             continue
 
         # Base case: a non-list value cannot be flattened further.
+        LOGGER.debug("Appending value: %s", item)
         flattened.append(item)
 
+    LOGGER.debug("Flattened result: %s", flattened)
     return flattened
 
 
@@ -69,6 +77,7 @@ class FlattenTheArray:
 
     def flatten(self, items: list[Any]) -> list[Any]:
         """Flatten a nested list while preserving the original item order."""
+        LOGGER.debug("FlattenTheArray wrapper called with: %s", items)
         return flatten_array(items)
 
 
