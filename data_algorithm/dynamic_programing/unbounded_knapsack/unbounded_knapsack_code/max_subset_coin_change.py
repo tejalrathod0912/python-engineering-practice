@@ -29,6 +29,7 @@ from collections.abc import Sequence
 
 
 LOGGER = logging.getLogger(__name__)
+LOGGER.addHandler(logging.NullHandler())
 
 
 class CoinChangeInputValidator:
@@ -79,7 +80,15 @@ class CoinChangeCombinationCounter:
             >>> CoinChangeCombinationCounter().count([1, 2, 3], 5)
             5
         """
-        normalized_coins = self._validator.validate(coins, target_sum)
+        try:
+            normalized_coins = self._validator.validate(coins, target_sum)
+        except ValueError:
+            LOGGER.exception(
+                "Invalid coin-change input: coin_count=%s, target_sum=%s",
+                len(coins),
+                target_sum,
+            )
+            raise
 
         LOGGER.debug(
             "Counting coin combinations for coins=%s, target_sum=%s",
@@ -161,18 +170,29 @@ class CoinChangeMaximumNumberWays:
         return self._counter.count(coins, target_sum)
 
 
-# __all__ = [
-#     "CoinChangeCombinationCounter",
-#     "CoinChangeInputValidator",
-#     "CoinChangeMaximumNumberWays",
-#     "count_coin_change_combinations",
-#     "max_subset_sum",
-# ]
+def run_coin_change_example(coins: Sequence[int], target_sum: int) -> int:
+    """Run the sample coin-change workflow and return the calculated result."""
+    coin_change_counter = CoinChangeCombinationCounter()
+    try:
+        return coin_change_counter.count(coins, target_sum)
+    except ValueError as error:
+        LOGGER.error("Could not count coin combinations: %s", error)
+        raise SystemExit(1) from error
+
+
+# __all__ is kept for backward compatibility. New code should import directly from the module.
+__all__ = [
+    "CoinChangeCombinationCounter",
+    "CoinChangeInputValidator",
+    "CoinChangeMaximumNumberWays",
+    "count_coin_change_combinations",
+    "max_subset_sum",
+    "run_coin_change_example",
+]
 
 
 if __name__ == "__main__":
     coins_list = [1, 2, 3]
     required_sum = 5
 
-    coin_change_counter = CoinChangeCombinationCounter()
-    print(coin_change_counter.count(coins_list, required_sum))
+    print(run_coin_change_example(coins_list, required_sum))
