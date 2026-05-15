@@ -13,6 +13,7 @@ from data_algorithm.dynamic_programing.unbounded_knapsack.unbounded_knapsack_cod
     CoinChangeMaximumNumberWays,
     count_coin_change_combinations,
     max_subset_sum,
+    run_coin_change_example,
 )
 
 
@@ -87,6 +88,31 @@ class TestMaxSubsetCoinChange(unittest.TestCase):
         """The production-facing function should reject invalid target sums."""
         with self.assertRaisesRegex(ValueError, "target_sum cannot be negative"):
             count_coin_change_combinations([1, 2, 3], -1)
+
+    def test_counter_logs_invalid_input_before_reraising(self) -> None:
+        """The production class should fail loud without hiding validation errors."""
+        counter = CoinChangeCombinationCounter()
+
+        with self.assertLogs(COIN_CHANGE_LOGGER_NAME, level="ERROR") as captured_logs:
+            with self.assertRaisesRegex(ValueError, "target_sum cannot be negative"):
+                counter.count([1, 2, 3], -1)
+
+        self.assertIn(
+            "Invalid coin-change input: coin_count=3, target_sum=-1",
+            "\n".join(captured_logs.output),
+        )
+
+    def test_run_coin_change_example_exits_safely_for_invalid_input(self) -> None:
+        """The script helper should convert validation errors into a safe exit."""
+        with self.assertLogs(COIN_CHANGE_LOGGER_NAME, level="ERROR") as captured_logs:
+            with self.assertRaises(SystemExit) as exit_context:
+                run_coin_change_example([1, 2, 3], -1)
+
+        self.assertEqual(exit_context.exception.code, 1)
+        self.assertIn(
+            "Could not count coin combinations: target_sum cannot be negative",
+            "\n".join(captured_logs.output),
+        )
 
     def test_max_subset_sum_rejects_non_positive_coins(self) -> None:
         """The function should reject zero and negative coin denominations."""
