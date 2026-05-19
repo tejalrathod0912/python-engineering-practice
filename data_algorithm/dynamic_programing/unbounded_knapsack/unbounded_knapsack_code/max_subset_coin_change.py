@@ -27,8 +27,9 @@ Code explanation:
 import logging
 from collections.abc import Sequence
 
-
+'''Create a logger for this file'''
 LOGGER = logging.getLogger(__name__)
+'''safely ignore logs if no logging system is set up.'''
 LOGGER.addHandler(logging.NullHandler())
 
 
@@ -112,7 +113,6 @@ class CoinChangeCombinationCounter:
                     combinations_by_sum[remaining_sum],
                     combinations_by_sum[current_sum],
                 )
-
         number_of_ways = combinations_by_sum[target_sum]
         LOGGER.debug("Number of combinations: %s", number_of_ways)
         return number_of_ways
@@ -180,7 +180,11 @@ def run_coin_change_example(coins: Sequence[int], target_sum: int) -> int:
         raise SystemExit(1) from error
 
 
-# __all__ is kept for backward compatibility. New code should import directly from the module.
+'''__all__ is kept for backward compatibility. New code should import directly from the module.
+__all__ is a list that defines which classes and functions are officially exposed when someone imports your module.
+Without __all__ defined, all classes and functions in the module are accessible. 
+ By defining __all__, you can control what is available for import and hide internal implementation details.'''
+
 __all__ = [
     "CoinChangeCombinationCounter",
     "CoinChangeInputValidator",
