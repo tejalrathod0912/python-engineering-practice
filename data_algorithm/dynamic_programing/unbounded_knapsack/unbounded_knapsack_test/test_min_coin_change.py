@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from contextlib import redirect_stdout
-from io import StringIO
 from pathlib import Path
-import runpy
+import subprocess
+import sys
 from typing import Any
 import unittest
 from unittest.mock import patch
@@ -126,13 +125,11 @@ class TestMinCoinChange(unittest.TestCase):
 
     def test_run_min_coin_change_example_prints_sample_answer(self) -> None:
         """The example runner should print the sample minimum coin count."""
-        captured_output = StringIO()
-
-        with redirect_stdout(captured_output):
+        with patch("builtins.print") as mock_print:
             exit_code = run_min_coin_change_example()
 
         self.assertEqual(exit_code, 0)
-        self.assertEqual(captured_output.getvalue().strip(), "1")
+        mock_print.assert_called_once_with(1)
 
     def test_run_min_coin_change_example_returns_error_code_for_invalid_input(self) -> None:
         """The example runner should convert validation errors into a safe exit code."""
@@ -157,14 +154,15 @@ class TestMinCoinChange(unittest.TestCase):
             / "unbounded_knapsack_code"
             / "min_coins_require_target_sum.py"
         )
-        captured_output = StringIO()
+        completed_process = subprocess.run(
+            [sys.executable, str(module_path)],
+            capture_output=True,
+            check=True,
+            text=True,
+        )
 
-        with redirect_stdout(captured_output):
-            with self.assertRaises(SystemExit) as exit_context:
-                runpy.run_path(str(module_path), run_name="__main__")
-
-        self.assertEqual(exit_context.exception.code, 0)
-        self.assertEqual(captured_output.getvalue().strip(), "1")
+        self.assertEqual(completed_process.returncode, 0)
+        self.assertEqual(completed_process.stdout.strip(), "1")
 
 
 if __name__ == "__main__":

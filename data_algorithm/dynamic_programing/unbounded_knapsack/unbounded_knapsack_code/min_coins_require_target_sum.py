@@ -116,24 +116,24 @@ class DynamicProgrammingCoinChangeSolver:
         if not normalized_coins:
             return IMPOSSIBLE_RESULT
 
-        unreachable = target_sum + 1
+        unreachable = float("inf")
+
         min_coins_by_amount = [unreachable] * (target_sum + 1)
-        min_coins_by_amount[0] = 0
+        min_coins_by_amount[0] = 0  # Base case: 0 coins are needed to make sum 0.
 
         for coin in normalized_coins:
             for amount in range(coin, target_sum + 1):
-                previous_amount = amount - coin
-                candidate_count = min_coins_by_amount[previous_amount] + 1
-
-                if candidate_count < min_coins_by_amount[amount]:
-                    min_coins_by_amount[amount] = candidate_count
+                if amount >= coin:
+                    remaining_amount = amount - coin
+                    candidate_count = 1 + min_coins_by_amount[remaining_amount]
+                    min_coins_by_amount[amount] = min(min_coins_by_amount[amount], candidate_count)
                     LOGGER.debug(
                         "Updated minimum coin count: coin=%s amount=%s count=%s",
                         coin,
                         amount,
                         candidate_count,
                     )
-
+                
         result = min_coins_by_amount[target_sum]
         if result == unreachable:
             LOGGER.debug("No coin combination can make target_sum=%s", target_sum)
@@ -150,6 +150,7 @@ def min_coin_change(coins: Sequence[int], target_sum: int) -> int:
     class while using the default dynamic programming strategy.
     """
     solver: CoinChangeSolver = DynamicProgrammingCoinChangeSolver()
+
     return solver.minimum_coins(coins, target_sum)
 
 
@@ -181,4 +182,5 @@ class MinNumberOfCoinsForTargetSum:
 
 
 if __name__ == "__main__":
+    # Return the example runner's status code to the operating system.
     raise SystemExit(run_min_coin_change_example())

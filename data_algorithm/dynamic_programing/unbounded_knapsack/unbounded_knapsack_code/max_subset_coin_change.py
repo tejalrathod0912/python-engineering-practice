@@ -27,9 +27,9 @@ Code explanation:
 import logging
 from collections.abc import Sequence
 
-'''Create a logger for this file'''
 LOGGER = logging.getLogger(__name__)
-'''safely ignore logs if no logging system is set up.'''
+# Avoid "No handler found" warnings when this module is imported by applications
+# that have not configured logging.
 LOGGER.addHandler(logging.NullHandler())
 
 
@@ -98,21 +98,22 @@ class CoinChangeCombinationCounter:
         )
 
         combinations_by_sum = [0] * (target_sum + 1)
-        combinations_by_sum[0] = 1
+        combinations_by_sum[0] = 1  # Base case: choose no coins to make sum 0.
 
         for coin_value in normalized_coins:
             for current_sum in range(coin_value, target_sum + 1):
-                remaining_sum = current_sum - coin_value
-                previous_combinations = combinations_by_sum[current_sum]
-                combinations_by_sum[current_sum] += combinations_by_sum[remaining_sum]
-                LOGGER.debug(
-                    "coin_value=%s current_sum=%s previous_ways=%s added_ways=%s total_ways=%s",
-                    coin_value,
-                    current_sum,
-                    previous_combinations,
-                    combinations_by_sum[remaining_sum],
-                    combinations_by_sum[current_sum],
-                )
+                if current_sum >= coin_value:
+                    remaining_sum = current_sum - coin_value
+                    previous_combinations = combinations_by_sum[current_sum] + combinations_by_sum[remaining_sum]
+                    combinations_by_sum[current_sum] = previous_combinations
+                    LOGGER.debug(
+                        "coin_value=%s current_sum=%s previous_ways=%s added_ways=%s total_ways=%s",
+                        coin_value,
+                        current_sum,
+                        previous_combinations,
+                        combinations_by_sum[remaining_sum],
+                        combinations_by_sum[current_sum],
+                    )
         number_of_ways = combinations_by_sum[target_sum]
         LOGGER.debug("Number of combinations: %s", number_of_ways)
         return number_of_ways
@@ -141,7 +142,7 @@ def count_coin_change_combinations(coins: Sequence[int], target_sum: int) -> int
 def max_subset_sum(coins: Sequence[int], coins_sum: int) -> int:
     """Return the number of combinations that make ``coins_sum``.
 
-    This name is kept for existing callers. Prefer
+    This legacy name is kept for existing callers. Prefer
     :func:`count_coin_change_combinations` in new code because it describes the
     business behavior more clearly.
     """
@@ -154,7 +155,7 @@ def max_subset_sum(coins: Sequence[int], coins_sum: int) -> int:
 
 
 class CoinChangeMaximumNumberWays:
-    """Backward-compatible class interface for existing callers."""
+    """Backward-compatible class wrapper for the original exercise name."""
 
     def __init__(self, counter: CoinChangeCombinationCounter | None = None) -> None:
         """Create the wrapper with an injected counter dependency."""
@@ -179,11 +180,6 @@ def run_coin_change_example(coins: Sequence[int], target_sum: int) -> int:
         LOGGER.error("Could not count coin combinations: %s", error)
         raise SystemExit(1) from error
 
-
-'''__all__ is kept for backward compatibility. New code should import directly from the module.
-__all__ is a list that defines which classes and functions are officially exposed when someone imports your module.
-Without __all__ defined, all classes and functions in the module are accessible. 
- By defining __all__, you can control what is available for import and hide internal implementation details.'''
 
 __all__ = [
     "CoinChangeCombinationCounter",

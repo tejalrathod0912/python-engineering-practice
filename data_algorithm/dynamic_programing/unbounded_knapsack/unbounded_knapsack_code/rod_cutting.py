@@ -11,14 +11,17 @@ Code explanation:
     pieces of length 1, four pieces of length 2, or any other combination whose
     lengths add up to 8.
 
-    The dynamic programming table stores the best revenue for every available
-    piece length and every target rod length:
+    The dynamic programming list stores the best revenue for every target rod
+    length from 0 through ``length``:
         1. Base case:
-           A rod of length 0 has revenue 0. With no piece sizes available, the
-           best revenue is also 0.
+           A rod of length 0 has revenue 0. Before any piece sizes are checked,
+           every target length also starts with revenue 0.
         2. Recurrence:
-           For each piece length, either skip it or take it. When we take it, we
-           stay on the same row because the same piece length can be reused.
+           For each piece length, check every current rod length. If the piece
+           fits, compare the current best revenue with the revenue from taking
+           that piece plus the best revenue for the remaining length. Because
+           the same ``dp_length`` list is reused, each piece length can be used
+           more than once.
 
     Example:
         Input:  length=8, prices=[2, 4, 10, 4, 9]
@@ -28,7 +31,7 @@ Code explanation:
         Time complexity is O(n * length), where n is the number of provided
         prices.
 
-        Space complexity is O(n * length) for the dynamic programming table.
+        Space complexity is O(length) for the dynamic programming list.
 """
 
 import logging
@@ -62,34 +65,29 @@ def rod_cutting(length: int, prices: list[int]) -> int:
 
     LOGGER.debug("Calculating best revenue for length=%s, prices=%s", length, prices)
 
-    piece_count = len(prices)
-    dp_table = [[0] * (length + 1) for _ in range(piece_count + 1)]
+    dp_length = [0] * (length + 1)
 
-    for piece_length in range(1, piece_count + 1):
-        piece_price = prices[piece_length - 1]
-
+    piece_len = len(prices)
+    for piece in range(1, piece_len + 1):
         for current_length in range(1, length + 1):
-            without_piece = dp_table[piece_length - 1][current_length]
 
-            if piece_length <= current_length:
-                remaining_length = current_length - piece_length
-                with_piece = piece_price + dp_table[piece_length][remaining_length]
-                dp_table[piece_length][current_length] = max(with_piece, without_piece)
+            if current_length >= piece:
+                remaining_length = current_length - piece
+                candidate_revenue = prices[piece - 1] + dp_length[remaining_length]
+                dp_length[current_length] = max(dp_length[current_length], candidate_revenue)
                 LOGGER.debug(
-                    "piece_length=%s current_length=%s with_piece=%s without_piece=%s best=%s",
-                    piece_length,
+                    "piece=%s current_length=%s candidate_revenue=%s best=%s",
+                    piece,
                     current_length,
-                    with_piece,
-                    without_piece,
-                    dp_table[piece_length][current_length],
+                    candidate_revenue,
+                    dp_length[current_length],
                 )
-                continue
 
-            dp_table[piece_length][current_length] = without_piece
+            continue
 
-    best_revenue = dp_table[piece_count][length]
-    LOGGER.debug("Best revenue: %s", best_revenue)
-    return best_revenue
+    result = dp_length[length]
+    LOGGER.debug("Best revenue: %s", result)
+    return result
 
 
 class RodCutting:

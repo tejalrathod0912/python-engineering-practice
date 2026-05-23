@@ -1,10 +1,9 @@
 """Tests for the unbounded knapsack rod cutting implementation."""
 
 import logging  # Used to verify that debug logs are emitted by the implementation.
-import runpy  # Used to execute the module's script block inside this test process.
+import subprocess  # Used to execute the module as a script and capture its output.
+import sys  # Used to run the module with the same Python interpreter as the tests.
 import unittest  # The unittest framework is used to define and run the test cases.
-from contextlib import redirect_stdout  # Used to capture output printed by the script block.
-from io import StringIO  # Used as an in-memory stream for captured script output.
 from pathlib import Path  # Used to construct the path to the module being tested.
 
 
@@ -74,8 +73,10 @@ class TestRodCutting(unittest.TestCase):
         log_output = "\n".join(captured_logs.output)
 
         self.assertIn("Calculating best revenue for length=4, prices=[1, 5, 8]", log_output)
-        self.assertIn("piece_length=2 current_length=4", log_output)
-        self.assertIn("Best revenue: 10", log_output)
+        self.assertIn(
+            "piece=2 current_length=4 candidate_revenue=10 best=10",
+            log_output,
+        )
 
     def test_module_prints_sample_output_when_run_as_script(self) -> None:
         """When executed directly, the module should print the sample answer."""
@@ -84,12 +85,14 @@ class TestRodCutting(unittest.TestCase):
             / "unbounded_knapsack_code"
             / "rod_cutting.py"
         )
-        captured_output = StringIO()
+        completed_process = subprocess.run(
+            [sys.executable, str(module_path)],
+            capture_output=True,
+            check=True,
+            text=True,
+        )
 
-        with redirect_stdout(captured_output):
-            runpy.run_path(str(module_path), run_name="__main__")
-
-        self.assertEqual(captured_output.getvalue().strip(), "24")
+        self.assertEqual(completed_process.stdout.strip(), "24")
 
 if __name__ == "__main__":
     unittest.main()

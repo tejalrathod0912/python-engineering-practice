@@ -1,10 +1,9 @@
 """Tests for the unbounded coin change implementation."""
 
 import logging
-import runpy
+import subprocess
+import sys
 import unittest
-from contextlib import redirect_stdout
-from io import StringIO
 from pathlib import Path
 
 from data_algorithm.dynamic_programing.unbounded_knapsack.unbounded_knapsack_code.max_subset_coin_change import (
@@ -184,18 +183,14 @@ class TestMaxSubsetCoinChange(unittest.TestCase):
             / "unbounded_knapsack_code"
             / "max_subset_coin_change.py"
         )
-        '''Create a fake output collector ,Instead of printing to screen, we capture output in memory'''
-        captured_output = StringIO()  
-        '''#StringIO() is a Python tool that lets you treat a string like a file in memory.write into it
-            read from it but nothing is saved to disk'''
+        completed_process = subprocess.run(
+            [sys.executable, str(module_path)],
+            capture_output=True,
+            check=True,
+            text=True,
+        )
 
-        '''3. Redirect print output to our collector while running the module as a script.
-        “Everything printed inside this block should go into captured_output instead of console”'''
-        with redirect_stdout(captured_output):
-            #Run the file like a script, which will execute the example function and print the result.
-            runpy.run_path(str(module_path), run_name="__main__")
-            '''Compare output:captured_output.getvalue() → gets printed text'''
-        self.assertEqual(captured_output.getvalue().strip(), "5")
+        self.assertEqual(completed_process.stdout.strip(), "5")
 
 
 if __name__ == "__main__":
