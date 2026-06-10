@@ -1,0 +1,79 @@
+# ------------------------------------------------------------
+# 📘 What is pyproject.toml? (Layman Explanation)
+#
+# Think of this file as the "blueprint" of your Python project.
+# It tells Python tools (pip, setuptools, CI/CD systems):
+#
+# - What your project is called
+# - What dependencies it needs
+# - How to build and install it
+# - Where your Python code (packages) are located
+#
+# Without this file, Python does not know how to treat your
+# folder as an installable project.
+# ------------------------------------------------------------
+
+
+# ------------------------------------------------------------
+# 🏗️ Build System Section
+# ------------------------------------------------------------
+
+[build-system]
+
+# Which tools are required to build/install this project
+requires = ["setuptools>=68"]
+# 👉 setuptools is the standard tool that packages Python projects
+# 👉 version >=68 ensures modern packaging support
+
+# Which backend should be used to build the project
+build-backend = "setuptools.build_meta"
+# 👉 tells pip: "Use setuptools to build this project"
+# 👉 this is the modern standard (PEP 517/518)
+
+
+# ------------------------------------------------------------
+# 📦 Project Metadata Section
+# ------------------------------------------------------------
+
+[project]
+
+# Name of the project (used when installing via pip)
+name = "python-engineering-practice"
+# 👉 This is the official package name shown to pip and CI/CD systems
+
+# Version of your project
+version = "1.0.0"
+# 👉 Helps track releases (important for production systems)
+
+# Short description of the project
+description = "Design Patterns Practice Project"
+# 👉 Explains what this project is about (used in documentation/tools)
+
+# External dependencies required to run this project
+dependencies = ["python-dotenv"]
+# 👉 pip will automatically install this package when installing project
+# 👉 used for reading .env files (environment variables)
+
+
+# ------------------------------------------------------------
+# 📁 Package Discovery Section
+# ------------------------------------------------------------
+
+[tool.setuptools.packages.find]
+
+# Where setuptools should start looking for Python packages
+where = ["."]
+# 👉 "." means current root directory
+# 👉 tells setuptools to scan entire project root
+
+# Which folders should be treated as Python packages
+include = ["config*","code_pattern*"]
+# 👉 only include these folders as installable modules
+# 👉 "*" means include submodules inside them too
+
+# Example:
+# config/settings.py will become importable as:
+# from config.settings import Settings
+#
+# singleton_pattern/... becomes:
+# from singleton_pattern.application_configuration_manager import ...
