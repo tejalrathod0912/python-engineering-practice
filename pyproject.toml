@@ -67,7 +67,7 @@ where = ["."]
 # 👉 tells setuptools to scan entire project root
 
 # Which folders should be treated as Python packages
-include = ["config*","code_pattern*"]
+include = ["code_pattern*","config*","data_algorithm*"]
 # 👉 only include these folders as installable modules
 # 👉 "*" means include submodules inside them too
 

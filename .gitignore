@@ -227,3 +227,10 @@ __marimo__/
 # Local project artifacts
 *.tmp
 *.bak
+
+# Local test/log artifacts
+test_output.log
+pytest.log
+.coverage
+.coverage.*
+htmlcov/
