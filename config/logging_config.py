@@ -11,10 +11,11 @@ from __future__ import annotations
 import logging
 import os
 from typing import Final
+import os 
+import dotenv
 
 
-LOG_LEVEL_ENV_VAR: Final[str] = "LOG_LEVEL"
-DEFAULT_LOG_FORMAT: Final[str] = "%(asctime)s %(levelname)s [%(name)s] %(message)s"
+DEFAULT_LOG_FORMAT: Final[str] = os.getenv("DEFAULT_LOG_FORMAT", "%(asctime)s %(levelname)s [%(name)s] %(message)s") #%(asctime)s %(levelname)s [%(name)s] %(message)s
 
 
 def configure_logging(level: int | str | None = None, *, force: bool = False) -> None:
@@ -34,8 +35,11 @@ def configure_logging(level: int | str | None = None, *, force: bool = False) ->
     logging.basicConfig(
         level=_coerce_log_level(level),
         format=DEFAULT_LOG_FORMAT,
-        force=force,
+        force=force, #The force parameter in logging.basicConfig() controls whether Python should replace existing logging configuration.
+        # force=False (default) If another module  called basicConfig(), this another call does nothing.
+        # force=True If another module called basicConfig(), this call will override the previous configuration.
     )
+
 
 
 def get_logger(name: str) -> logging.Logger:
@@ -45,18 +49,23 @@ def get_logger(name: str) -> logging.Logger:
     applications that have not configured logging yet, while still allowing
     messages to propagate when the application does configure logging.
     """
-    logger = logging.getLogger(name)
+    #name = __name__
+    logger = logging.getLogger(name) # <Logger __main__ (WARNING)>
+    
+    # logger.handlers = []
+    
 
     if not any(isinstance(handler, logging.NullHandler) for handler in logger.handlers):
         logger.addHandler(logging.NullHandler())
-
+    # logger.handlers =[<NullHandler (NOTSET)>]
     return logger
 
 
 def _coerce_log_level(level: int | str | None) -> int:
     """Normalize supported logging level inputs to an integer."""
+
     if level is None:
-        level = os.getenv(LOG_LEVEL_ENV_VAR, "DEBUG")
+        level = os.getenv("LOG_LEVEL", "INFO")
 
     if isinstance(level, bool):
         raise TypeError("level must be an integer, string, or None")
@@ -67,11 +76,14 @@ def _coerce_log_level(level: int | str | None) -> int:
     if isinstance(level, str):
         normalized_level = level.strip().upper()
 
+        # Allow numeric values like "10"
         if normalized_level.isdigit():
             return int(normalized_level)
 
-        resolved_level = logging.getLevelName(normalized_level)
-        if isinstance(resolved_level, int):
+        # Convert DEBUG -> 10, INFO -> 20, etc.
+        resolved_level = logging._nameToLevel.get(normalized_level)
+
+        if resolved_level is not None:
             return resolved_level
 
         raise ValueError(f"Unknown logging level: {level}")

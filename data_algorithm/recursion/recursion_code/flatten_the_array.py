@@ -31,10 +31,9 @@ Code explanation:
 
 import logging
 from typing import Any
+from config.logging_config import configure_logging, get_logger
 
-
-LOGGER = logging.getLogger(__name__)
-
+LOGGER = get_logger(__name__)
 
 def flatten_array(items: list[Any]) -> list[Any]:
     """Return a new list with all nested list values flattened.
@@ -83,4 +82,5 @@ class FlattenTheArray:
 
 if __name__ == "__main__":
     sample_input = [1, 2, [3, 4], 5, [6, 7, 8], 9]
+    configure_logging()
     print(flatten_array(sample_input))

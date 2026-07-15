@@ -1,4 +1,5 @@
 """0/1 knapsack solved with bottom-up dynamic programming.
+Tabulation = Bottom-Up DP :Because we start from the smallest problems (the bottom) and build upward.
 
 Definition:
     Given item weights, item values, and a maximum knapsack capacity, choose a
@@ -29,11 +30,28 @@ from dataclasses import dataclass, field
 from typing import Final, Protocol
 
 from config.logging_config import configure_logging, get_logger
+import os
+from dotenv import load_dotenv
 
 
-LOGGER = get_logger(__name__)
-MAX_ITEMS: Final[int] = 1_000
-MAX_CAPACITY: Final[int] = 100_000
+# These are the official public objects that external applications should use. 
+# Everything else is considered internal implementation detail."
+__all__ = [
+    "KnapsackInputValidator",
+    "KnapsackSolver",
+    "MAX_CAPACITY",
+    "MAX_ITEMS",
+    "TabulationKnapsackSolver",
+    "ZeroOneKnapsackCalculator",
+    "knapsackdp",
+    "run_knapsack_example",
+    "zero_one_knapsack",
+]
+
+LOGGER = get_logger(__name__) #<Logger __main__ (WARNING)>
+
+MAX_ITEMS: Final[int] = os.getenv("MAx_ITEMS", 1_000) #1_000
+MAX_CAPACITY: Final[int] = os.getenv("MAx_CAPACITY", 100_000) #100_000
 
 
 class KnapsackSolver(Protocol):
@@ -192,8 +210,10 @@ class TabulationKnapsackSolver:
                 values,
                 capacity,
             )
-        except (TypeError, ValueError):
-            LOGGER.exception(
+        except (TypeError, ValueError): #error for log no exception 
+            #Application/API entry point layer: error
+            #Library/business logic layer: exception    
+            LOGGER.exception( 
                 "Invalid 0/1 knapsack input: item_count=%s, capacity=%s",
                 _safe_len(weights),
                 capacity,
@@ -302,17 +322,6 @@ def _safe_len(values: object) -> int | str:
         return "unknown"
 
 
-__all__ = [
-    "KnapsackInputValidator",
-    "KnapsackSolver",
-    "MAX_CAPACITY",
-    "MAX_ITEMS",
-    "TabulationKnapsackSolver",
-    "ZeroOneKnapsackCalculator",
-    "knapsackdp",
-    "run_knapsack_example",
-    "zero_one_knapsack",
-]
 
 
 if __name__ == "__main__":  # pragma: no cover

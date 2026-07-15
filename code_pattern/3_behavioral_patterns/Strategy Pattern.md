@@ -2,7 +2,7 @@
 
 ### Definition
 
-Encapsulates different algorithms and allows them to be selected at runtime.
+The Strategy Pattern is a coding design pattern that allows you to change the behavior of a program without changing the main code.
 
 ### Real-World Analogy
 

@@ -1,9 +1,0 @@
-[run]
-source = data_algorithm
-omit =
-    */*_test/*
-
-[report]
-exclude_lines =
-    pragma: no cover
-    if __name__ == .__main__.:
