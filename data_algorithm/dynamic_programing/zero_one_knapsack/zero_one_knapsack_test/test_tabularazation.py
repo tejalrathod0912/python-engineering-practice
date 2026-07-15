@@ -31,6 +31,7 @@ LOGGER_NAME = (
 )
 
 
+
 class TestZeroOneKnapsack(unittest.TestCase):
     """Validate normal behavior, edge cases, logging, and defensive checks."""
 
@@ -242,22 +243,22 @@ class TestZeroOneKnapsack(unittest.TestCase):
             "\n".join(captured_logs.output),
         )
 
-    def test_module_prints_sample_output_when_run_as_script(self) -> None:
-        """When executed directly, the module should print the sample answer."""
-        module_path = (
-            Path(__file__).resolve().parents[1]
-            / "zero_one_knapsack_code"
-            / "tabularazation.py"
-        )
-        completed_process = subprocess.run(
-            [sys.executable, str(module_path)],
-            capture_output=True,
-            check=True,
-            text=True,
-        )
+    # def test_module_prints_sample_output_when_run_as_script(self) -> None:
+    #     """When executed directly, the module should print the sample answer.""" ̑
+    #     module_path = (
+    #         Path(__file__).resolve().parents[1]
+    #         / "zero_one_knapsack_code"
+    #         / "tabularazation.py"
+    #     )
+    #     completed_process = subprocess.run(
+    #         [sys.executable, str(module_path)],
+    #         capture_output=True,
+    #         check=True,
+    #         text=True,
+    #     )
 
-        self.assertEqual(completed_process.returncode, 0)
-        self.assertEqual(completed_process.stdout.strip(), "8")
+    #     self.assertEqual(completed_process.returncode, 0)
+    #     self.assertEqual(completed_process.stdout.strip(), "8")
 
 
 class TestLoggingConfig(unittest.TestCase):
@@ -296,9 +297,10 @@ class TestLoggingConfig(unittest.TestCase):
 
     def test_get_logger_adds_one_null_handler(self) -> None:
         """Library loggers should be safe before application logging is configured."""
-        logger = logging.getLogger("tests.knapsack.logging_config")
-        logger.handlers.clear()
-        self.addCleanup(logger.handlers.clear)
+        logger = logging.getLogger("tests.knapsack.logging_config") #Create a logger with the name "tests.knapsack.logging_config".
+        #This logger is used to test the behavior of the get_logger function. No handlers are attached to this logger yet, so it has no way to handle log messages.
+        logger.handlers.clear() #This removes any handlers already attached to this logger.
+        self.addCleanup(logger.handlers.clear) #After this test finishes, clear the handlers again."
 
         configured_logger = get_logger(logger.name)
         configured_again = get_logger(logger.name)

@@ -70,10 +70,11 @@ where = ["."]
 include = ["code_pattern*","config*","data_algorithm*"]
 # 👉 only include these folders as installable modules
 # 👉 "*" means include submodules inside them too
+# 👉 code_pattern: Design patterns examples (creational, structural, behavioral)
+# 👉 config: Configuration and logging setup for the project
+# 👉 data_algorithm: Data structures and algorithm implementations
 
-# Example:
-# config/settings.py will become importable as:
-# from config.settings import Settings
-#
-# singleton_pattern/... becomes:
-# from singleton_pattern.application_configuration_manager import ...
+# Example imports after installation:
+# from config.logging_config import configure_logging
+# from code_pattern.creational_pattern.singleton_pattern import SingletonPattern
+# from data_algorithm.dynamic_programing.zero_one_knapsack import zero_one_knapsack
